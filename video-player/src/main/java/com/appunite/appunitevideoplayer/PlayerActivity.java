@@ -41,6 +41,7 @@ import android.view.Window;
 import android.view.accessibility.CaptioningManager;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.appunite.appunitevideoplayer.player.DashRendererBuilder;
@@ -124,6 +125,7 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
     private ViewGroup controllerView;
     private Toolbar toolbar;
     private ViewGroup root;
+    private ProgressBar progressBar;
 
     public static Intent getVideoPlayerIntent(@NonNull Context context,
                                               @NonNull final String videoUrl,
@@ -172,8 +174,7 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         toolbar.setTitle(getIntent().getStringExtra(TITLE_TEXT_EXTRA));
-        toolbar
-                .setNavigationOnClickListener(new View.OnClickListener() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         finish();
@@ -191,6 +192,8 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
 
         audioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         audioCapabilitiesReceiver.register();
+
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
     }
 
     @Override
@@ -308,6 +311,9 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
         if (playbackState == ExoPlayer.STATE_ENDED) {
             showControls();
         }
+        final boolean showProgress = playbackState == ExoPlayer.STATE_BUFFERING
+                || playbackState == ExoPlayer.STATE_PREPARING;
+        progressBar.setVisibility(showProgress ? View.VISIBLE : View.GONE);
     }
 
     @Override
